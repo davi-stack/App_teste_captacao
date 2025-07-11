@@ -15,7 +15,27 @@ class NetworkInfoModule(reactContext: ReactApplicationContext) :
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(reactContext)
 
     override fun getName(): String = "NetworkInfoModule"
-
+    fun getNetworkTypeName(type: Int): String {
+        return when (type) {
+            TelephonyManager.NETWORK_TYPE_GPRS -> "2G (GPRS)"
+            TelephonyManager.NETWORK_TYPE_EDGE -> "2G (EDGE)"
+            TelephonyManager.NETWORK_TYPE_CDMA -> "2G (CDMA)"
+            TelephonyManager.NETWORK_TYPE_1xRTT -> "2G (1xRTT)"
+            TelephonyManager.NETWORK_TYPE_IDEN -> "2G (iDEN)"
+            TelephonyManager.NETWORK_TYPE_UMTS -> "3G (UMTS)"
+            TelephonyManager.NETWORK_TYPE_EVDO_0,
+            TelephonyManager.NETWORK_TYPE_EVDO_A,
+            TelephonyManager.NETWORK_TYPE_EVDO_B -> "3G (EVDO)"
+            TelephonyManager.NETWORK_TYPE_HSDPA,
+            TelephonyManager.NETWORK_TYPE_HSUPA,
+            TelephonyManager.NETWORK_TYPE_HSPA -> "3G (HSPA)"
+            TelephonyManager.NETWORK_TYPE_EHRPD -> "3G (eHRPD)"
+            TelephonyManager.NETWORK_TYPE_HSPAP -> "3G (HSPA+)"
+            TelephonyManager.NETWORK_TYPE_LTE -> "4G (LTE)"
+            TelephonyManager.NETWORK_TYPE_NR -> "5G (NR)"
+            else -> "Desconhecido"
+        }
+    }
     @SuppressLint("MissingPermission")
     @ReactMethod
     fun getNetworkInfo(promise: Promise) {
@@ -36,7 +56,8 @@ class NetworkInfoModule(reactContext: ReactApplicationContext) :
                         rsrp = signal.rsrp
                         rsrq = signal.rsrq
                         cellId = cellInfo.cellIdentity.ci
-                        radioTech = "LTE"
+                        val networkType = telephonyManager.networkType
+                        radioTech = getNetworkTypeName(networkType)
                         break
                     }
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cellInfo is CellInfoNr && cellInfo.isRegistered -> {
