@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, PermissionsAndroid, Platform, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { NativeModules } from 'react-native';
 
-// Interface para os dados de rede
 interface NetworkInfo {
   rsrp: number;
   rsrq: number;
@@ -12,11 +11,15 @@ interface NetworkInfo {
   longitude: number;
 }
 
+
+
 const App = () => {
   const [networkInfo, setNetworkInfo] = useState<NetworkInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+
+ 
 
   // Referência para o intervalo de atualização
   const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -56,6 +59,7 @@ const App = () => {
       return false;
     }
   }, []);
+ 
 
   // Iniciar monitoramento contínuo
   const startMonitoring = useCallback(async () => {
@@ -165,16 +169,8 @@ const App = () => {
             <Text style={styles.actionButtonText}>Atualizar Agora</Text>
           </TouchableOpacity>
           
-          {intervalRef.current ? (
-            <TouchableOpacity onPress={stopMonitoring} style={[styles.actionButton, styles.stopButton]}>
-              <Text style={styles.actionButtonText}>Parar Monitoramento</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={startMonitoring} style={[styles.actionButton, styles.startButton]}>
-              <Text style={styles.actionButtonText}>Iniciar Monitoramento</Text>
-            </TouchableOpacity>
-          )}
         </View>
+        
       </View>
     </View>
   );
