@@ -15,6 +15,7 @@ class NetworkInfoModule(reactContext: ReactApplicationContext) :
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(reactContext)
 
     override fun getName(): String = "NetworkInfoModule"
+    
     fun getNetworkTypeName(type: Int): String {
         return when (type) {
             TelephonyManager.NETWORK_TYPE_GPRS -> "2G (GPRS)"
@@ -36,6 +37,7 @@ class NetworkInfoModule(reactContext: ReactApplicationContext) :
             else -> "Desconhecido"
         }
     }
+    
     @SuppressLint("MissingPermission")
     @ReactMethod
     fun getNetworkInfo(promise: Promise) {

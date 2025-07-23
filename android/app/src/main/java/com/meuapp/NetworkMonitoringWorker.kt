@@ -31,7 +31,7 @@ import com.google.android.gms.tasks.Tasks
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 // location
-const url = ""
+// const url = ""
 data class NetworkInfoData(
     val rsrp: Int,
     val rsrq: Int,
@@ -216,7 +216,7 @@ class NetworkMonitoringWorker(
         
         // 3. Criar a requisição POST para sua API
         val request = Request.Builder()
-            .url(url+"/upload-csv/")
+            .url("http://54.233.209.5:8080/upload-csv/")
             .post(requestBody)
             .addHeader("Content-Type", "text/csv")
             .build()
