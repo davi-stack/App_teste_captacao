@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, PermissionsAndroid, Platform, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { NativeModules } from 'react-native';
+import {  uploadPdfFile } from './service/send';
+import { Button } from 'react-native';
 
 interface NetworkInfo {
   rsrp: number;
@@ -171,6 +173,9 @@ const App = () => {
           
         </View>
         
+      </View>
+      <View style={styles.infoSection}>
+        <Button title="Enviar pdf teste" onPress={ uploadPdfFile} />
       </View>
     </View>
   );
