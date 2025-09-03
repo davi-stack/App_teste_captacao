@@ -30,12 +30,15 @@ import com.google.android.gms.tasks.Tasks
 
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+
+
+
 // location
 // const url = ""
 data class NetworkInfoData(
     val rsrp: Int,
     val rsrq: Int,
-    val cellId: Int,
+    val cellId: String,
     val technology: String,
     val latitude: Double,
     val longitude: Double
@@ -51,7 +54,7 @@ class NetworkMonitoringWorker(
     }
 
     companion object {
-        private const val MAX_LINES = 10
+        private const val MAX_LINES = 100
         private const val LOG_FILE = "network_log.csv"
         
         fun schedule(context: Context) {
@@ -81,29 +84,49 @@ class NetworkMonitoringWorker(
 
         var rsrp = 0
         var rsrq = 0
-        var cellId = 0
+        var cellId = ""
         var radioTech = ""
 
         val cellInfoList = telephonyManager.allCellInfo
 
         for (cellInfo in cellInfoList.orEmpty()) {
-            when {
+                  when {
+                // LTE
                 cellInfo is CellInfoLte && cellInfo.isRegistered -> {
                     val signal = cellInfo.cellSignalStrength as CellSignalStrengthLte
                     rsrp = signal.rsrp
                     rsrq = signal.rsrq
-                    cellId = cellInfo.cellIdentity.ci
-                    radioTech = getNetworkTypeName(telephonyManager.networkType)
+
+                    val identity = cellInfo.cellIdentity
+                    val mcc = identity.mccString ?: "000"
+                    val mnc = identity.mncString ?: "00"
+                    val tac = identity.tac
+                    val ci = identity.ci
+                    val eci = (tac * 256) + (ci % 256)
+                    
+                    val cgi = "$mcc-$mnc-$tac:-$ci"
+                    cellId = cgi
+
+                    val networkType = telephonyManager.networkType
+                    radioTech = getNetworkTypeName(networkType)
                     break
                 }
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-                        cellInfo is CellInfoNr && cellInfo.isRegistered -> {
+
+                // 5G NR
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && cellInfo is CellInfoNr && cellInfo.isRegistered -> {
                     val signal = cellInfo.cellSignalStrength as CellSignalStrengthNr
                     val identity = cellInfo.cellIdentity as CellIdentityNr
                     rsrp = signal.dbm
                     rsrq = signal.csiRsrq ?: 0
-                    cellId = identity.nci.toInt()
-                    radioTech = "5G (NR)"
+
+                    val mcc = identity.mccString ?: "000"
+                    val mnc = identity.mncString ?: "00"
+                    val tac = identity.tac
+                    val nci = identity.nci
+
+                    val cgi = "$mcc$mnc:$tac:$nci"
+                    cellId = cgi
+                    radioTech = "NR"
                     break
                 }
             }
@@ -216,7 +239,7 @@ class NetworkMonitoringWorker(
         
         // 3. Criar a requisição POST para sua API
         val request = Request.Builder()
-            .url("http://54.233.209.5:8080/upload-csv/")
+            .url("http://52.67.45.180:8080/upload-csv/")
             .post(requestBody)
             .addHeader("Content-Type", "text/csv")
             .build()

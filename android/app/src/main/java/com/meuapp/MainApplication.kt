@@ -13,8 +13,8 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
-import com.meuapp.NetworkInfoPackage
-
+// import com.meuapp.NetworkInfoPackage
+import com.meuapp.networkinfo.NetworkInfoSDK
 class MainApplication : Application(), ReactApplication {
 
     override val reactNativeHost: ReactNativeHost =
@@ -39,23 +39,31 @@ class MainApplication : Application(), ReactApplication {
     override fun onCreate() {
         super.onCreate()
         SoLoader.init(this, OpenSourceMergedSoMapping)
-        
+
+        Log.d("APP_DEBUG", "SoLoader inicializado!")
+
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
             load()
+            Log.d("APP_DEBUG", "Nova arquitetura carregada!")
         }
-        
-        // Chama explicitamente o método para ativar a captura
-        scheduleNetworkMonitoringWorker()
+
+        NetworkInfoSDK.start(this)
+        Log.d("APP_DEBUG", "NetworkInfoSDK iniciado!")
+
+        // scheduleNetworkMonitoringWorker()
     }
 
-    private fun scheduleNetworkMonitoringWorker() {
-        try {
-            WorkManager.getInstance(this).cancelUniqueWork("NetworkLogger")
+
+    // private fun scheduleNetworkMonitoringWorker() {
+    //     try {
+    //         WorkManager.getInstance(this).cancelUniqueWork("NetworkLogger")
             
-            NetworkMonitoringWorker.schedule(this)
-            Log.d("MainApplication", "NetworkMonitoringWorker ativado e agendado com sucesso")
-        } catch (e: Exception) {
-            Log.e("MainApplication", "Erro ao ativar NetworkMonitoringWorker", e)
-        }
-    }
+    //         NetworkMonitoringWorker.schedule(this)
+    //         Log.d("MainApplication", "NetworkMonitoringWorker ativado e agendado com sucesso")
+    //     } catch (e: Exception) {
+    //         Log.e("MainApplication", "Erro ao ativar NetworkMonitoringWorker", e)
+    //     }
+    // }
+
+
 }

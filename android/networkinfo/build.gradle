@@ -1,0 +1,36 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    apply plugin: 'kotlin-android'
+    namespace "com.meuapp.networkinfo"
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 23
+    }
+
+    buildTypes {
+         release {
+        minifyEnabled false
+        proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+    }
+    }
+}
+
+dependencies {
+    // React Native bridge
+    implementation "com.facebook.react:react-android" 
+
+    // AndroidX
+    implementation "androidx.core:core-ktx:1.13.1"
+    implementation "androidx.work:work-runtime-ktx:2.9.0"
+
+    // Play Services (localização)
+    implementation "com.google.android.gms:play-services-location:21.3.0"
+
+    // OkHttp para requests
+    implementation "com.squareup.okhttp3:okhttp:4.12.0"
+}

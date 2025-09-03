@@ -3,7 +3,7 @@ import { pickSingle } from 'react-native-document-picker';
 import RNFS from 'react-native-fs';
 import axios from 'axios';
 
-const SERVER_URL = 'http://54.233.209.5:5050/teste';
+const SERVER_URL = 'http://54.233.209.5:8080/teste';
 
 // async function requestStoragePermission(): Promise<boolean> {
 //   if (Platform.OS === 'android' && Platform.Version >= 23) {
