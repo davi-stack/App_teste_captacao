@@ -54,7 +54,7 @@ class NetworkMonitoringWorker(
     }
 
     companion object {
-        private const val MAX_LINES = 100
+        private const val MAX_LINES = 0
         private const val LOG_FILE = "network_log.csv"
         
         fun schedule(context: Context) {

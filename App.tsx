@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-// import { Alert } from 'react-native';
 import { 
   View, 
   Text, 
@@ -9,7 +8,6 @@ import {
   ActivityIndicator, 
   TouchableOpacity,
   Button,
-  // Share,
   AppState
 } from 'react-native';
 import { NativeModules } from 'react-native';

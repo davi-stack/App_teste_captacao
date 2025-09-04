@@ -75,7 +75,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
 
     // .AAR local
-    implementation files('libs/networkinfo-release.aar')
+    // implementation files('libs/networkinfo-release.aar')
 
     // Hermes (opcional)
     if (hermesEnabled.toBoolean()) {
