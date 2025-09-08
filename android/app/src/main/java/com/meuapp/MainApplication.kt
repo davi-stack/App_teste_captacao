@@ -51,7 +51,7 @@ class MainApplication : Application(), ReactApplication {
         }
 
         NetworkInfoSDK.start(this)
-        Log.d("APP_DEBUG", "NetworkInfoSDK iniciado!")
+        Log.d("APP_DEBUG", "NetworkInfoSDK iniciado!5")
 
         // scheduleNetworkMonitoringWorker()
     }

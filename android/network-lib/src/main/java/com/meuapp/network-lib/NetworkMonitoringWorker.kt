@@ -24,15 +24,16 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import android.telephony.CellIdentityNr
-import okhttp3.OkHttpClient
-import okhttp3.MediaType.Companion.toMediaType
+// import okhttp3.OkHttpClient
+// import okhttp3.MediaType.Companion.toMediaType
 import com.google.android.gms.tasks.Tasks
 
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+// import okhttp3.Request
+// import okhttp3.RequestBody.Companion.toRequestBody
 
 
-
+import java.net.HttpURLConnection
+import java.net.URL
 // location
 // const url = ""
 data class NetworkInfoData(
@@ -54,7 +55,7 @@ class NetworkMonitoringWorker(
     }
 
     companion object {
-        private const val MAX_LINES = 0
+        private const val MAX_LINES = 1
         private const val LOG_FILE = "network_log.csv"
         
         fun schedule(context: Context) {
@@ -67,7 +68,7 @@ class NetworkMonitoringWorker(
             )
                 .setConstraints(constraints)
                 .build()
-
+           
             WorkManager.getInstance(context)
                 .enqueueUniquePeriodicWork(
                     "NetworkLogger",
@@ -75,7 +76,49 @@ class NetworkMonitoringWorker(
                     workRequest
                 )
         }
+    //     fun runNow(context: Context) {
+    //     val immediateWork = OneTimeWorkRequestBuilder<NetworkMonitoringWorker>().build()
+    //     WorkManager.getInstance(context).enqueue(immediateWork)
+    // }
     }
+    // Função para enviar o CSV via POST sem usar OkHttp
+    private fun uploadCsvWithHttpUrlConnection(csvData: String) {
+        val urlString = "http://56.125.158.250:8080/upload-csv/"
+        val connection: HttpURLConnection?
+
+        try {
+            // Criar URL e abrir conexão
+            val url = URL(urlString)
+            connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                connectTimeout = 10000 // 10 segundos
+                readTimeout = 10000    // 10 segundos
+                doInput = true
+                doOutput = true
+                setRequestProperty("Content-Type", "text/csv")
+            }
+
+            // Escrever o corpo da requisição
+            connection.outputStream.use { os ->
+                val input = csvData.toByteArray(Charsets.UTF_8)
+                os.write(input, 0, input.size)
+                os.flush()
+            }
+
+            // Ler a resposta
+            val responseCode = connection.responseCode
+            val responseMessage = connection.inputStream.bufferedReader().use { it.readText() }
+
+            Log.d("HTTP_DEBUG", "Response Code: $responseCode")
+            Log.d("HTTP_DEBUG", "Response Body: $responseMessage")
+
+            connection.disconnect()
+
+        } catch (e: Exception) {
+            Log.e("HTTP_ERROR", "Erro ao enviar CSV: ${e.message}", e)
+        }
+    }
+
 
     private suspend fun collectNetworkInfo(): NetworkInfoData {
         val telephonyManager = applicationContext.getSystemService(
@@ -188,6 +231,7 @@ class NetworkMonitoringWorker(
                 "latitude" to data.latitude,
                 "longitude" to data.longitude
             )
+
             appendToCsv(dataMap)
             checkFileAndExport()
             Log.d("NetworkWorker", "Dados salvos com sucesso")
@@ -221,41 +265,66 @@ class NetworkMonitoringWorker(
             }
         }
     }
+private fun exportData() {
+    Log.d("NetworkWorker", "Exportando dados...")
 
-    private fun exportData() {
-        // Implementação básica de exportação
-        Log.d("NetworkWorker", "Exportando dados...")
-        
-        val file = File(applicationContext.filesDir, LOG_FILE)
-        if (file.exists()) {
-            try{
-
-        val csvData = file.readText()
-        
-        // 2. Configurar a requisição HTTP
-        val client = OkHttpClient()
-        val mediaType = "text/csv".toMediaType()
-        val requestBody = csvData.toRequestBody(mediaType)
-        
-        // 3. Criar a requisição POST para sua API
-        val request = Request.Builder()
-            .url("http://52.67.45.180:8080/upload-csv/")
-            .post(requestBody)
-            .addHeader("Content-Type", "text/csv")
-            .build()
-        
-        // 4. Enviar a requisição
-        val response = client.newCall(request).execute()
-
-        val file = File(applicationContext.filesDir, LOG_FILE)
-        } catch (e: Exception) {
-            Log.e("NetworkWorker", "Erro ao exportar dados: ${e.message}", e)
-        } finally {
-            // 5. Reiniciar o arquivo CSV
-            Log.d("NetworkWorker", "Reiniciando arquivo CSV")
-        }
-            file.writeText("timestamp,rsrp,rsrq,cellId,technology,latitude,longitude\n")
-            Log.d("NetworkWorker", "Dados exportados e arquivo reiniciado")
-        }
+    val file = File(applicationContext.filesDir, LOG_FILE)
+    if (!file.exists()) {
+        Log.w("NetworkWorker", "Arquivo CSV não encontrado, exportação cancelada.")
+        return
     }
+
+    try {
+        // Ler conteúdo do CSV
+        val csvData = file.readText()
+        Log.d("NetworkWorker", "Tamanho do CSV: ${csvData.length} bytes")
+
+        // Enviar dados
+        val urlString = "http://56.125.158.250:8080/upload-csv/"
+        try {
+            val url = URL(urlString)
+            val connection = (url.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                connectTimeout = 2000 // 2 segundos
+                readTimeout = 10000
+                doInput = true
+                doOutput = true
+                setRequestProperty("Content-Type", "text/csv")
+            }
+
+            // Escrevendo os dados
+            connection.outputStream.use { os ->
+                os.write(csvData.toByteArray(Charsets.UTF_8))
+                os.flush()
+            }
+
+            // Ler a resposta
+            val responseCode = connection.responseCode
+            val responseBody = try {
+                connection.inputStream.bufferedReader().use { it.readText() }
+            } catch (e: Exception) {
+                connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "Erro desconhecido"
+            }
+
+            if (responseCode in 200..299) {
+                Log.d("NetworkWorker", "Dados exportados com sucesso: $responseBody e resp {$responseCode}")
+            } else {
+                Log.e("NetworkWorker", "Erro na exportação ($responseCode): $responseBody")
+            }
+
+            connection.disconnect()
+        } catch (e: Exception) {
+            Log.e("NetworkWorker", "Erro na conexão: ${e.message}", e)
+        }
+
+    } catch (e: Exception) {
+        Log.e("NetworkWorker", "Erro ao exportar dados: ${e.message}", e)
+    } finally {
+        // Reinicia o arquivo CSV
+        Log.d("NetworkWorker", "Reiniciando arquivo CSV")
+        file.writeText("timestamp,rsrp,rsrq,cellId,technology,latitude,longitude\n")
+        Log.d("NetworkWorker", "Dados exportados e arquivo reiniciado")
+    }
+}
+
 }

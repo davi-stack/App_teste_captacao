@@ -10,10 +10,9 @@ extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
     ex.autolinkLibrariesFromCommand()
 }
 
-include(":networkinfo")
-project(":networkinfo").projectDir = file("networkinfo")
 
-
+include ':network-lib'
+project(':network-lib').projectDir = new File(rootDir, 'network-lib')
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 
