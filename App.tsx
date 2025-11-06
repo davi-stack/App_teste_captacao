@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
-  View, 
-  Text, 
+  View,
   StyleSheet, 
   PermissionsAndroid, 
   Platform, 
   ActivityIndicator, 
   TouchableOpacity,
-  Button,
-  AppState
+  AppState,
+  ToastAndroid
 } from 'react-native';
 import { NativeModules } from 'react-native';
-import { uploadPdfFile } from './service/send';
+// import { uploadPdfFile } from './service/send';
 // import { format } from 'date-fns';
 
 interface NetworkInfo {
@@ -23,6 +22,7 @@ interface NetworkInfo {
   longitude: number;
   timestamp?: string;
 }
+import { Text} from "react-native";
 
 const App = () => {
   
@@ -134,6 +134,7 @@ const App = () => {
         },
         body: csvContent,
       });
+      ToastAndroid.show('Enviando CSV para o servidor...', ToastAndroid.SHORT);
   
       const result = await response.json();
   
@@ -147,7 +148,7 @@ const App = () => {
       }
     } catch (err) {
       console.error('Erro ao enviar CSV:', err);
-      setError('Erro ao enviar CSV para o servidor');
+      setError('Erro ao enviar CSV para o servidor' );
     }
   }, [recordedData]);
   
@@ -267,9 +268,7 @@ const App = () => {
         </View>
       </View>
       
-      <View style={styles.infoSection}>
-        <Button title="Enviar pdf teste" onPress={uploadPdfFile} />
-      </View>
+      
     </View>
   );
 };

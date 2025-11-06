@@ -1,19 +1,6 @@
-pluginManagement {
-    includeBuild("../node_modules/@react-native/gradle-plugin")
-}
+rootProject.name = "MeuApp"
 
-plugins {
-    id("com.facebook.react.settings")
-}
+include(":app")
+include(":network-lib")
+project(":network-lib").projectDir = new File(rootDir, "network-lib")
 
-extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
-    ex.autolinkLibrariesFromCommand()
-}
-
-
-include ':network-lib'
-project(':network-lib').projectDir = new File(rootDir, 'network-lib')
-include ':app'
-includeBuild('../node_modules/@react-native/gradle-plugin')
-
-rootProject.name = 'MeuApp'

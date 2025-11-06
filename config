@@ -7,3 +7,5 @@ echo 'export PATH=$PATH:$ANDROID_HOME/platform-tools' >> ~/.bashrc
 
 # Recarregar o bashrc
 source ~/.bashrc
+
+

@@ -69,6 +69,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation "com.google.android.gms:play-services-tasks:18.0.2"
 
+    implementation 'com.facebook.react:react-native-gradle-plugin:0.71.8'
     // WorkManager & Coroutines
     implementation "androidx.work:work-runtime-ktx:2.7.1"
     implementation "androidx.concurrent:concurrent-futures-ktx:1.1.0"

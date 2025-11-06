@@ -57,16 +57,4 @@ class MainApplication : Application(), ReactApplication {
     }
 
 
-    // private fun scheduleNetworkMonitoringWorker() {
-    //     try {
-    //         WorkManager.getInstance(this).cancelUniqueWork("NetworkLogger")
-            
-    //         NetworkMonitoringWorker.schedule(this)
-    //         Log.d("MainApplication", "NetworkMonitoringWorker ativado e agendado com sucesso")
-    //     } catch (e: Exception) {
-    //         Log.e("MainApplication", "Erro ao ativar NetworkMonitoringWorker", e)
-    //     }
-    // }
-
-
 }

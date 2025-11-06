@@ -55,7 +55,7 @@ class NetworkMonitoringWorker(
     }
 
     companion object {
-        private const val MAX_LINES = 1
+        private const val MAX_LINES = 100
         private const val LOG_FILE = "network_log.csv"
         
         fun schedule(context: Context) {
@@ -121,6 +121,7 @@ class NetworkMonitoringWorker(
 
 
     private suspend fun collectNetworkInfo(): NetworkInfoData {
+        //Esse é o método principal que coleta as informações de rede e localização
         val telephonyManager = applicationContext.getSystemService(
             Context.TELEPHONY_SERVICE
         ) as TelephonyManager
@@ -129,7 +130,9 @@ class NetworkMonitoringWorker(
         var rsrq = 0
         var cellId = ""
         var radioTech = ""
-
+        // var ul = ""
+        // var dl = ""
+        
         val cellInfoList = telephonyManager.allCellInfo
 
         for (cellInfo in cellInfoList.orEmpty()) {
@@ -311,7 +314,7 @@ private fun exportData() {
             } else {
                 Log.e("NetworkWorker", "Erro na exportação ($responseCode): $responseBody")
             }
-
+            
             connection.disconnect()
         } catch (e: Exception) {
             Log.e("NetworkWorker", "Erro na conexão: ${e.message}", e)
