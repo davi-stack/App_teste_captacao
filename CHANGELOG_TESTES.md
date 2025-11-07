@@ -1,9 +1,4 @@
 # 📋 Changelog - Implementação de Testes QA
-
-**Data:** 07/11/2025  
-**Autor:** Lucas (Colaborador QA)  
-**Tipo:** Adição de Suite Completa de Testes
-
 ---
 
 ## 🎯 Resumo das Modificações
