@@ -1,0 +1,6 @@
+rootProject.name = "MeuApp"
+
+include(":app")
+include(":network-lib")
+project(":network-lib").projectDir = new File(rootDir, "network-lib")
+
